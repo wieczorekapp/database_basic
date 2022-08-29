@@ -1,0 +1,134 @@
+package studia;
+
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // KONFIGURACJA PORAMETROW POLACZENIA
+        Connection conn = null;
+
+        String connectionString =
+                "jdbc:oracle:thin:@//admlab2.cs.put.poznan.pl:1521/"+
+                        "dblab02_students.cs.put.poznan.pl";
+
+        Properties connectionProps = new Properties();
+        connectionProps.put("user", "ZAO140858");
+        connectionProps.put("password", "zao140858");
+
+        try {
+            conn = DriverManager.getConnection(connectionString,
+                    connectionProps);
+            System.out.println("Połączono z bazą danych");
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE,
+                    "Nie udało się połączyć z bazą danych", ex);
+            System.exit(-1);
+        }
+
+        // =============================================================================================================
+        // wyłączenie autozatwierdzania
+        System.out.println("WYłączenie autozatwierdzania");
+        try {
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // wyświtlenie etatów
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                     "select nazwa " +
+                             "from etaty ");) {
+            while (rs.next()) {
+                System.out.println("Nazwa etatu " + rs.getString(1));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        // dodanie etatu
+        try (Statement stmt = conn.createStatement()) {
+            String insert = "insert into etaty values('SPECJALNY', 1000, 2000)";
+            stmt.executeUpdate(insert);
+            System.out.println("dodano rekord");
+
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        // wyświtlenie etatów
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                     "select nazwa " +
+                             "from etaty ");) {
+            while (rs.next()) {
+                System.out.println("Nazwa etatu " + rs.getString(1));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        System.out.println("ROLLBACK");
+        try {
+            conn.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // wyświtlenie etatów
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                     "select nazwa " +
+                             "from etaty ");) {
+            while (rs.next()) {
+                System.out.println("Nazwa etatu " + rs.getString(1));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        // dodanie etatu
+        try (Statement stmt = conn.createStatement()) {
+            String insert = "insert into etaty values('SPECJALNY', 1000, 2000)";
+            stmt.executeUpdate(insert);
+            System.out.println("dodano rekord");
+
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        System.out.println("Zatwierdzenie transakcji");
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // wyświtlenie etatów
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                     "select nazwa " +
+                             "from etaty ");) {
+            while (rs.next()) {
+                System.out.println("Nazwa etatu " + rs.getString(1));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+        // =============================================================================================================
+
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Odłączono od bazy danych");
+    }
+}

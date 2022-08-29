@@ -1,0 +1,69 @@
+package studia;
+
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // KONFIGURACJA PORAMETROW POLACZENIA
+        Connection conn = null;
+
+        String connectionString =
+                "jdbc:oracle:thin:@//admlab2.cs.put.poznan.pl:1521/"+
+                        "dblab02_students.cs.put.poznan.pl";
+
+        Properties connectionProps = new Properties();
+        connectionProps.put("user", "ZAO140858");
+        connectionProps.put("password", "zao140858");
+
+        try {
+            conn = DriverManager.getConnection(connectionString,
+                    connectionProps);
+            System.out.println("Połączono z bazą danych");
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE,
+                    "Nie udało się połączyć z bazą danych", ex);
+            System.exit(-1);
+        }
+
+        // =============================================================================================================
+        String [] nazwiska = {"Woźniak", "Dąbrowski", "Kozłowski"};
+        String [] etaty = {"ASYSTENT", "PROFESOR", "ADIUNKT"};
+        int [] place = {1300, 1700, 1500};
+
+        try (PreparedStatement pstmt = conn.prepareStatement("insert into pracownicy values(id_prac_seq.NEXTVAL, ?, ?, 100, SYSDATE, ?, 0, 40)")) {
+
+            for (int i = 0; i < 3; i++) {
+                pstmt.setString(1, nazwiska[i]);
+                pstmt.setString(2, etaty[i]);
+                pstmt.setInt(3, place[i]);
+
+                try {
+                    pstmt.executeUpdate();
+                    System.out.println("Dodano");
+
+                } catch (SQLException ex) {
+                    System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Błąd wykonania polecenia: " + ex.getMessage());
+        }
+
+
+        // =============================================================================================================
+
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Odłączono od bazy danych");
+    }
+}
