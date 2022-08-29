@@ -1,0 +1,453 @@
+# wyswietlenie wszystkich baz
+show dbs
+
+# urzycie bazy student niezaleznie czy ona istnieje
+use student
+
+# usuniecie aktualnej bazy
+db.dropDatabase()
+
+# stworzenie kolekcji pracownicy, wraz z pierwszym dokumentem
+db.pracownicy.insert({ id_prac : 100,
+"nazwisko" : "WEGLARZ",
+"placa_pod" : 1730 })
+
+# wyswitlnie kolekcji w bazie
+db.getCollectionNames()
+
+# wyszukanie wszystkich dokumentow w kolekcji
+db.pracownicy.find()
+
+# dodanie pracownika
+db.pracownicy.insert({ id_prac : 100,
+"nazwisko" : "WEGLARZ",
+"placa_pod" : 1730 })
+
+# dokument zostaje wstawiony poniewaz nasze id_prac nie jest kluczem główny,
+# dokumenty różnią się od siebie automatycznie nadawanym rpzez baze _id
+db.pracownicy.find()
+
+# jawne nadanie _id
+# _id ma wartosc wskazana przez uzytkowanika
+db.pracownicy.insert({ _id:100,
+id_prac : 100,
+"nazwisko" : "WEGLARZ",
+"placa_pod" : 1730 })
+
+# dodanie nowego pracownika z nowa struktura dokumentu, jest data
+db.pracownicy.insert({ id_prac : 110,
+"nazwisko" : "BLAZEWICZ",
+"placa_pod" : 1350,
+zatrudniony: new Date("1973-05-01") })
+
+
+# format daty zatrudniony: 1973-05-01T00:00:00.000Z
+
+# zad 1
+# w kolekcji mamy 4 dokumenty
+db.pracownicy.find().size()
+
+
+# 2 #############################################################################
+# wyczyszczesnie kolekcji
+db.pracownicy.drop()
+
+# dodanie dokumentow
+db.pracownicy.insert([
+{id_prac:100, nazwisko:"WEGLARZ", etat:'DYREKTOR', zatrudniony: new Date("1968-01-01"), placa_pod:1730.00, placa_dod:420.50, id_zesp:10},
+{id_prac:110, nazwisko:'BLAZEWICZ', etat:"PROFESOR",id_szefa:100, zatrudniony:
+new Date("1973-05-01"), placa_pod:1350.00, placa_dod:210.00, id_zesp:40},
+{id_prac:120, nazwisko:'SLOWINSKI', etat:"PROFESOR",id_szefa:100, zatrudniony:
+new Date("1977-09-01"), placa_pod:1070.00, id_zesp:30},
+{id_prac:130, nazwisko:'BRZEZINSKI', etat:"PROFESOR",id_szefa:100, zatrudniony:
+new Date("1968-07-01"), placa_pod:960.00, id_zesp:20},
+{id_prac:140, nazwisko:'MORZY', etat:"PROFESOR",id_szefa:130, zatrudniony: new
+Date("1975-09-15"), placa_pod:830.00, placa_dod:105.00, id_zesp:20},
+{id_prac:150, nazwisko:'KROLIKOWSKI', etat:'ADIUNKT',id_szefa:130, zatrudniony:
+new Date("1977-09-01"), placa_pod:645.50, id_zesp:20},
+{id_prac:160, nazwisko:'KOSZLAJDA', etat:'ADIUNKT', id_szefa:130, zatrudniony:
+new Date("1985-03-01"), placa_pod:590.00, id_zesp:20},
+{id_prac:170, nazwisko:'JEZIERSKI', etat:'ASYSTENT', id_szefa:130, zatrudniony:
+new Date("1992-10-01"), placa_pod:439.70, placa_dod:80.50, id_zesp:20},
+{id_prac:190, nazwisko:'MATYSIAK', etat:'ASYSTENT', id_szefa:140, zatrudniony:
+new Date("1993-09-01"), placa_pod:371.00, id_zesp:20},
+{id_prac:180, nazwisko:'MAREK', etat:'SEKRETARKA', id_szefa:100, zatrudniony:
+new Date("1985-02-20"), placa_pod:410.20, id_zesp:10},
+{id_prac:200, nazwisko:'ZAKRZEWICZ', etat:'STAZYSTA', id_szefa:140, zatrudniony:
+new Date("1994-07-15"), placa_pod:208.00, id_zesp:30},
+{id_prac:210, nazwisko:'BIALY', etat:'STAZYSTA', id_szefa:130, zatrudniony: new
+Date("1993-10-15"), placa_pod:250.00, placa_dod:170.60, id_zesp:30},
+{id_prac:220, nazwisko:'KONOPKA', etat:'ASYSTENT', id_szefa:110, zatrudniony:
+new Date("1993-10-01"), placa_pod:480.00, id_zesp:20},
+{id_prac:230, nazwisko:'HAPKE', etat:'ASYSTENT', id_szefa:120, zatrudniony: new
+Date("1992-09-01"), placa_pod:480.00, placa_dod:90.00, id_zesp:30}
+])
+
+# zad 2
+# dodanie kolekcji zespoly i dokumentow
+db.zespoly.insert([
+{"id_zesp":10,"nazwa":"ADMINISTRACJA","adres":"PIOTROWO 3A"},
+{"id_zesp":20,"nazwa":"SYSTEMY ROZPROSZONE","adres":"PIOTROWO 3A"},
+{"id_zesp":30,"nazwa":"SYSTEMY EKSPERCKIE","adres":"STRZELECKA 14"},
+{"id_zesp":40,"nazwa":"ALGORYTMY","adres":"WLODKOWICA 16"},
+{"id_zesp":50,"nazwa":"BADANIA OPERACYJNE","adres":"MIELZYNSKIEGO 30"}
+])
+
+
+# wyswietlenie profrsorow
+db.pracownicy.find({"etat":"PROFESOR"})
+db.pracownicy.find({"etat":"PROFESOR"}).pretty()
+db.pracownicy.find({"etat":"PROFESOR"}, {"nazwisko":1})
+db.pracownicy.find({"etat":"PROFESOR"}, {"nazwisko":1, "placa_pod":1})
+
+# zad 3
+# wyswitla tylko nazwisko bez _id
+db.pracownicy.find({"etat":"PROFESOR"}, {"nazwisko":1, "_id":0})
+# wyswietla wszystkie poza nazwisko i _id
+db.pracownicy.find({"etat":"PROFESOR"}, {"nazwisko":0, "_id":0})
+
+# powoduje blad poniewaz nie moze wykluczyc nieistnijacego w zapytaniu pola
+db.pracownicy.find({"etat":"PROFESOR"}, {"nazwisko":1, "placa_pod":0})
+
+# wszyscy rozni od profesora
+db.pracownicy.find({"etat":{$ne:"PROFESOR"}})
+
+# zapytanie z warukiem i ograniczeniem pol
+db.pracownicy.find(
+{"placa_pod":{$gt:500}},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# niejawane podanie and
+db.pracownicy.find(
+{"placa_pod":{$gt:1000}, "etat":"PROFESOR"},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# jawne podanie and
+db.pracownicy.find(
+{$and:[{"placa_pod":{$gt:1000}}, {"etat":"PROFESOR"}]},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# poprawna placa w zakresie od 500 do 700
+db.pracownicy.find(
+{$and:[{"placa_pod":{$gt:500}}, {"placa_pod":{$lt:700}}]},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# lub 
+db.pracownicy.find(
+{"placa_pod":{$gt:500, $lt:700}},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# place mnijsze od 700
+db.pracownicy.find(
+{"placa_pod":{$gt:500}, "placa_pod": {$lt:700}},
+{"nazwisko":1,"placa_pod":1}
+)
+
+# przyklad zastosowania or
+db.pracownicy.find(
+{$or:[{"placa_pod":{$gt:1000}}, {"etat":"PROFESOR"}]},
+{"nazwisko":1, "etat":1, "placa_pod":1}
+)
+
+# zad 4
+db.pracownicy.find(
+{"placa_pod": {$gte: 200, $lte: 500}},
+{"_id": 0, "nazwisko": 1, "etat": 1, "placa_pod": 1}
+)
+
+# wartosc ze zbioru
+db.pracownicy.find(
+{"id_zesp":{$in:[10,20]}},
+{"nazwisko":1,"id_zesp":1}
+)
+
+# sortowanie
+db.pracownicy.find(
+{"etat":"PROFESOR"},
+{"nazwisko":1, "placa_pod":1}
+).sort(
+{"placa_pod":-1})
+
+# zad 5
+db.pracownicy.find(
+{"placa_pod": {$gt: 400}},
+{"_id": 0, "nazwisko": 1, "etat": 1, "placa_pod": 1}
+).sort(
+{"etat": 1, "placa_pod": -1}
+)
+
+# ograniczanie zbioru wynikow
+db.pracownicy.find(
+{},
+{"nazwisko":1, "placa_pod":1}
+).sort(
+{"placa_pod":-1}
+).limit(3)
+
+# zad 6
+db.pracownicy.find(
+{"id_zesp": 20},
+{"_id": 0, "nazwisko": 1, "placa_pod":1}
+).sort(
+{"placa_pod": -1}
+).skip(1).limit(1)
+
+# wyrazenia regularne
+db.pracownicy.find(
+{"etat":"PROFESOR", "nazwisko":{$regex:"SKI"}},
+{"nazwisko":1}
+)
+
+# zad 7
+db.pracownicy.find(
+{"id_zesp": {$in: [20,30]}, "etat": {$ne: "ASYSTENT"}, "nazwisko": {$regex: "I$"}},
+{"_id": 0, "nazwisko": 1, "etat": 1}
+)
+
+# wartosci puste
+db.pracownicy.find({"placa_dod":null})
+# wartosci nie puste is not null
+db.pracownicy.find({"placa_dod":{$ne:null}})
+
+
+# Użycie języka JavaScript dla dopasowania dokumentów
+# zastapinie coalesce
+db.pracownicy.find(
+{$where:
+"this.placa_pod + (this.placa_dod != null? this.placa_dod:0) > 1000"},
+{"nazwisko":1, "placa_pod":1, "placa_dod":1}
+)
+
+# mechanizm agregacji
+db.pracownicy.aggregate([
+{$project:{ "_id":0,
+"stanowisko":"$etat",
+"pensja_roczna":{$multiply:["$placa_pod",12]},
+"miesiac_zatrudnienia": {$month:"$zatrudniony"}
+}
+}
+])
+
+db.pracownicy.aggregate([
+{$match:{"id_zesp":20}},
+{$project:{
+"_id":0,
+"stanowisko":"$etat",
+"pensja_roczna":{$multiply:["$placa_pod",12]},
+"miesiac_zatrudnienia": {$month:"$zatrudniony"}
+}
+}
+])
+
+db.pracownicy.aggregate([
+{$group: {
+_id: null,
+wyplaty_razem: {$sum: "$placa_pod"},
+maksymalna: {$max: "$placa_pod"},
+}
+}
+])
+
+db.pracownicy.aggregate([
+{$group: {
+_id: "$id_zesp",
+wyplaty_razem: {$sum: "$placa_pod"},
+maksymalna: {$max: "$placa_pod"},
+}
+}
+])
+
+
+db.pracownicy.aggregate([
+{$group:{
+_id: {rok_zatrudnienia:{$year:"$zatrudniony"}},
+liczba_zatrudnionych: {$sum: 1}
+}
+}
+])
+
+# zad 8
+db.pracownicy.aggregate([
+{$project: {
+"_id": 0,
+"stanowisko":"$etat",
+"nazwisko": 1,
+"rok_zatrudnienia":{$year:"$zatrudniony"}
+}
+},
+{$sort: {"placa_pod": -1}},
+{$skip: 2},
+{$limit: 1}
+])
+
+# zad 9
+db.pracownicy.aggregate([
+{$group: {
+_id: "$id_zesp",
+liczba: {$sum: 1}
+
+}
+},
+{$match: {
+liczba: {$gt: 3}
+}
+}
+])
+
+# wykorzystanie if null
+db.pracownicy.aggregate([
+{ $project: { "nazwisko": 1,
+"placa_pod": 1,
+"placa_dod": 1,
+"placa": {
+$add: ["$placa_pod", { $ifNull: ["$placa_dod", 0] }]
+}
+}
+}
+])
+
+# laczenie kilku kolekcji
+db.pracownicy.aggregate([
+{$lookup: {from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as:"zespol_pracownika"
+}
+}
+])
+
+db.pracownicy.aggregate([
+{$lookup:{from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as: "zespol_pracownika"}
+},
+{$project:{"id_prac":1,
+"nazwisko":1,
+"zespol_pracownika":1}
+}
+])
+
+
+db.pracownicy.aggregate([
+{ $lookup: {from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as: "zespol_pracownika"}
+},
+{ $project: {"id_prac":1,
+"nazwisko":1,
+"zespol": {$arrayElemAt:["$zespol_pracownika.nazwa",0]}
+}
+}
+])
+
+# zad 10
+db.pracownicy.aggregate([
+{$lookup: {from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as: "zespol_pracownika"
+}
+},
+{$project: {
+"_id": 0,
+"nazwisko":1,
+"dept": {$arrayElemAt:["$zespol_pracownika.adres",0]}
+}
+}
+])
+
+# zad 11
+db.pracownicy.aggregate([
+{$lookup: {from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as: "zespol_pracownika"
+}
+},
+{$project: {
+"_id": 0,
+"nazwisko":1,
+"dept": {$arrayElemAt:["$zespol_pracownika.adres",0]},
+"zespol": {$arrayElemAt:["$zespol_pracownika.nazwa",0]}
+}
+},
+{$match: {
+ "dept": {$regex: "STRZELECKA"}
+}
+}
+])
+
+
+# zad 12
+db.pracownicy.aggregate([
+{$lookup: {from: "zespoly",
+localField: "id_zesp",
+foreignField: "id_zesp",
+as: "zespol_pracownika"
+}
+},
+{$project: {
+"_id": 0,
+"nazwisko":1,
+"zespol": {$arrayElemAt:["$zespol_pracownika.nazwa",0]}
+}
+},
+{$group: {
+_id: "$zespol",
+liczba: {$sum: 1},
+}
+}
+])
+
+
+# zad 13
+var pracownicy = db.pracownicy.find();
+while (pracownicy.hasNext()) {
+	prac = pracownicy.next();
+	zesp = db.zespoly.findOne({"id_zesp": prac.id_zesp});
+	db.pracownicy.update(
+	{"id_prac": prac.id_prac},
+	{$set: {"id_zesp": zesp._id}}
+	)
+	//print(prac.nazwisko + ":" + zesp.nazwa);
+}
+
+# zad 14
+db.produkty.find(
+{"oceny.osoba": {$nin: ["Ania", "Karol"]}},
+{_id:0, nazwa:1}
+)
+
+# zad 15
+db.produkty.aggregate([
+{$unwind : "$oceny" },
+{$project: {
+"_id": 0,
+"produkt": "$nazwa",
+"oceny":1
+}
+},
+{$group: {
+_id:"$produkt",
+srednia_ocena: {$avg: "$oceny.ocena"}
+}
+}
+]).sort({"srednia_ocena": -1}).limit(1)
+
+# zad 16
+db.produkty.update(
+{"nazwa":"Kosiarka elektryczna"},
+{$push: {oceny: {osoba: "Ania", ocena: 4}}}
+)
+
+# zad 18
+db.produkty.remove(
+{"oceny.ocena": {$lt: 3}}
+)
